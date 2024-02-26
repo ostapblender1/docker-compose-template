@@ -1,0 +1,45 @@
+version: "3.9"
+volumes:
+  CONTAINERNAME_data:
+services:
+  SERVICENAME:
+    container_name: CONTAINERNAME
+    image: CONTAINERIMAGE
+    shm_size: 1g
+    #command:
+    #  - '...'
+    #  - '...'
+    environment:
+      - ENV_PARAM1=${ENV_PARAM1}
+      - ENV_PARAM2=${ENV_PARAM2}
+      - ENV_PARAM3=${ENV_PARAM3}
+    volumes:
+      - CONTAINERNAME_data:/var/lib/CONTAINERNAME/data
+      - ./HOSTFILE.yml:/CONTAINERPATH/CONTAINERFILE.yml
+    ports:
+      - "HOST_PORT:CONTAINER_PORT"
+    healthcheck:
+      test: ["CMD-SHELL", "curl --silent  --fail http://localhost || exit 1"]
+      #test: wget --no-verbose --tries=1 --spider http://localhost || exit 1 #alternative
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    logging:
+      options:
+        max-size: 50m
+    deploy:
+      resources:
+        limits:
+          cpus: '4'
+          memory: 8G
+    networks:
+    - frontend_network
+    - backend_network
+    
+networks:
+  frontend_network:
+    driver: bridge
+  backend_network:
+    external: true
